@@ -96,8 +96,11 @@ def solve():
         print(f"Best Word is: {character_probability(words, characters )}")
         user_input = input_word(words, WORD_LENGTH)
         user_response = input_response(WORD_LENGTH)
+        if user_response == "GGGGG":
+            print("Congrats!")
+            break
         words, characters = update_wordlist(words, characters, user_input, user_response)
-
+    print("Schade!")
 
 
 
@@ -135,7 +138,7 @@ def update_wordlist(words, characters, user_input, user_response):
         else:
             raise ValueError
 
-    return words, characters
+    return updated_words, characters
 
 
 
