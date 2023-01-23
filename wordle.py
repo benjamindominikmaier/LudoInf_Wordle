@@ -102,32 +102,40 @@ def solve():
 
 
 def update_wordlist(words, characters, user_input, user_response):
-    print(user_input)
-    print(user_response)
+    #print(user_input)
+    #print(user_response)
     updated_words = words.copy()
+
     for character_index in range(len(user_input)):
         if user_response[character_index] == "G":
             # alle wörter auf falschen character überprüfen
             for word in words:
                 if user_input[character_index] != word[character_index]:
-                    updated_words.remove(word)
+                    if word in updated_words:
+                        updated_words.remove(word)
 
         elif user_response[character_index] == "Y":
             for word in words:
                 if (user_input[character_index] == word[character_index]) or (user_input[character_index] not in word):
-                    updated_words.remove(word)
+                    if word in updated_words:
+                        updated_words.remove(word)
 
         elif user_response[character_index] == "?":
-            characters.remove(user_input[character_index])
+            try:
+                characters.remove(user_input[character_index])
+            except:
+                continue
+
             for word in words:
                 if user_input[character_index] in word:
-                    updated_words.remove(word)
+                    if word in updated_words:
+                        updated_words.remove(word)
 
 
         else:
             raise ValueError
 
-        return updated_words, characters
+    return words, characters
 
 
 
@@ -196,4 +204,4 @@ def benchmark(possible_words, ALLOWABLE_CHARACTERS):
 
 if __name__ == '__main__':
     solve()
-    #update_wordlist(["hallo","liste","bruno"])
+    #print(update_wordlist(["hallo","liste","bruno",],ALLOWABLE_CHARACTERS,"clara","?????"))
