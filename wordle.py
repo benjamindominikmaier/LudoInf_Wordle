@@ -7,7 +7,7 @@ import operator
 from collections import Counter
 from itertools import chain
 
-DICT = "/usr/share/dict/american-english"
+DICT = "words_alpha.txt"
 
 ALLOWABLE_CHARACTERS = set(string.ascii_letters)
 #ALLOWABLE_CHARACTERS = set("A", "B", "C", ... "Z", "")
@@ -27,13 +27,12 @@ def retrieve_words(path: str, word_length: int=5):
     """
     dict = open(path, "r")
     words = dict.readlines()
-    #print(len(words))
+
     processed_words = []
     for word in words:
-        if len(word) == word_length+1:
-            if word[0:-1].isalpha():
-                processed_words.append(word[0:-1].upper())
-    # print(processed_words[0:10], len(processed_words))
+        word = word.replace("\n","")
+        if len(word) == word_length:
+            processed_words.append(word.upper())
     dict.close()
     return processed_words
 
@@ -64,11 +63,13 @@ def character_probability(words, characters):
                 temp_word_value += result_dict[character]
             except:
                 temp_word_value = 9999999999999999
+        if len(set(word)) < len(word):
+            temp_word_value += 5000 * (len(word) - len(set(word)))
         if temp_word_value < min_value:
             print("Better word found with value ", temp_word_value)
             min_value = temp_word_value
             min_word = word
-    print(min_word, min_value)
+    #print(min_word, min_value)
     return min_word
 
 
@@ -88,9 +89,46 @@ def solve():
     :return:
     :rtype:
     """
+    words = retrieve_words(DICT, WORD_LENGTH)
+    characters = ALLOWABLE_CHARACTERS.copy()
+    for attempt in range(1,ALLOWED_ATTEMPTS+1):
+        print(f"Attempt: {attempt}")
+        print(f"Best Word is: {character_probability(words, characters )}")
+        user_input = input_word(words, WORD_LENGTH)
+        user_response = input_response(WORD_LENGTH)
+        words, characters = update_wordlist(words, characters, user_input, user_response)
 
 
-    pass
+
+
+def update_wordlist(words, characters, user_input, user_response):
+    print(user_input)
+    print(user_response)
+    updated_words = words.copy()
+    for character_index in range(len(user_input)):
+        if user_response[character_index] == "G":
+            # alle wörter auf falschen character überprüfen
+            for word in words:
+                if user_input[character_index] != word[character_index]:
+                    updated_words.remove(word)
+
+        elif user_response[character_index] == "Y":
+            for word in words:
+                if (user_input[character_index] == word[character_index]) or (user_input[character_index] not in word):
+                    updated_words.remove(word)
+
+        elif user_response[character_index] == "?":
+            characters.remove(user_input[character_index])
+            for word in words:
+                if user_input[character_index] in word:
+                    updated_words.remove(word)
+
+
+        else:
+            raise ValueError
+
+        return updated_words, characters
+
 
 
 ### User interface ###
@@ -157,5 +195,5 @@ def benchmark(possible_words, ALLOWABLE_CHARACTERS):
 # 5. Nun doch Tests schreiben
 
 if __name__ == '__main__':
-    possible_words = retrieve_words(DICT, WORD_LENGTH)
-    character_probability(possible_words, ALLOWABLE_CHARACTERS)
+    solve()
+    #update_wordlist(["hallo","liste","bruno"])
